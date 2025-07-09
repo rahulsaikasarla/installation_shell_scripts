@@ -1,10 +1,13 @@
 #!/bin/bash/
-sudo apt update
+sudo apt update -y
+sudo apt upgrade -y
 
 #openjdk-21 installation
 echo "openjdk-21 installation"
-sudo apt install fontconfig openjdk-21-jre
+sleep 10
+sudo apt install fontconfig openjdk-21-jre -y
 java --version
+sleep 10
 
 #jenkins installation
 sudo wget -O /etc/apt/keyrings/jenkins-keyring.asc \
@@ -12,9 +15,10 @@ sudo wget -O /etc/apt/keyrings/jenkins-keyring.asc \
 echo "deb [signed-by=/etc/apt/keyrings/jenkins-keyring.asc]" \
   https://pkg.jenkins.io/debian binary/ | sudo tee \
   /etc/apt/sources.list.d/jenkins.list > /dev/null
-sudo apt-get update
-sudo apt-get install jenkins
+sudo apt-get update -y
+sudo apt-get install jenkins -y
 echo "Jenkins version"
 jenkins --version
+sleep 10
 echo "To display the jenkins status"
-systmctl status jenkins
+systemctl status jenkins.service
