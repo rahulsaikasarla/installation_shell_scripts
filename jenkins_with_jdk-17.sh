@@ -15,3 +15,6 @@ sudo apt-get update -y
 sleep 10
 echo "installing jenkins"
 sudo apt-get install jenkins -y
+echo "jenkins --version"
+sleep 10
+systemctl status jenkins.service
