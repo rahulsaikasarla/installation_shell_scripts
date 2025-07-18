@@ -23,6 +23,7 @@ sudo systemctl enable postgresql
 sudo -i -u postgres
 
 #Now createuser sonar
+createuser sonar
 psql -c "ALTER USER sonar WITH ENCRYPTED PASSWORD 'sonar';"
 createdb -O sonar sonarqube
 exit
