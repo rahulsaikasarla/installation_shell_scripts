@@ -1,42 +1,74 @@
+#!/bin/bash
+
+#update the server
+echo "running below commands"
 sudo apt update && sudo apt upgrade -y
+sleep 3
+#Now install openjdk here i'm using jdk-17
 sudo apt install openjdk-17-jdk -y
+sleep 3
+echo "java version"
 java -version
+sleep 6
+
+#Now install postgresql and start
 sudo apt install postgresql postgresql-contrib -y
+sleep 5
+echo "status"
 sudo systemctl start postgresql
+sleep 5
 sudo systemctl enable postgresql
+
+#login to postgres
 sudo -i -u postgres
 
-##------------------
-#createuser sonar
+#Now createuser sonar
 psql -c "ALTER USER sonar WITH ENCRYPTED PASSWORD 'sonar';"
 createdb -O sonar sonarqube
 exit
-#-------------------------
+sleep 5
+#Download sonarqube binaries
 wget https://binaries.sonarsource.com/Distribution/sonarqube/sonarqube-10.5.1.90531.zip
+sleep 3
 
+#To unzio files Install unzip application 
 sudo apt install unzip -y
 unzip sonarqube-10.5.1.90531.zip 
+
+#Move dir to /opt
 sudo mv sonarqube-10.5.1.90531 /opt/sonarqube
+sudo rm -rf *.zip
+#Now add sonarqube user and also permissions 
 sudo groupadd sonar
 sudo useradd -d /opt/sonarqube -g sonar sonar
 sudo chown -R sonar:sonar /opt/sonarqube
 
+#Now add dir for sonarqube logs with permissions
 sudo mkdir -p /opt/sonarqube/logs
 sudo chown -R sonar:sonar /opt/sonarqube/logs
 
-#-------------------------
-sudo nano /opt/sonarqube/conf/sonar.properties
+cd /opt/sonarqube/conf/
 
+#Taking backup before adding
+sudo cp /opt/sonarqube/conf/sonar.properties sonar.properties_backup
 
+#Now add below lines to sonar.properties
+cat <<EOF | sudo tee /opt/sonarqube/conf/sonar.properties
 sonar.jdbc.username=sonar
 sonar.jdbc.password=sonar
 sonar.jdbc.url=jdbc:postgresql://localhost/sonarqube
-sonar.path.logs=/opt/sonarqube/logs   
-#------------------------------------------
+sonar.path.logs=/opt/sonarqube/logs
+EOF
 
-#------------------------------------
-sudo nano /etc/systemd/system/sonarqube.service
+#To add manual run and add below -> sudo nano /opt/sonarqube/conf/sonar.properties
+#sonar.jdbc.username=sonar
+#sonar.jdbc.password=sonar
+#sonar.jdbc.url=jdbc:postgresql://localhost/sonarqube
+#sonar.path.logs=/opt/sonarqube/logs   
 
+
+# Adding service 
+cat <<EOF | sudo tee /etc/systemd/system/sonarqube.service
 [Unit]
 Description=SonarQube service
 After=syslog.target network.target
@@ -56,7 +88,9 @@ PIDFile=/opt/sonarqube/temp/sonar.pid
 
 [Install]
 WantedBy=multi-user.target
--------------------------------
+EOF
+
+# Reload systemctl and start SonarQube
 
 sudo systemd-analyze verify /etc/systemd/system/sonarqube.service
 sudo adduser --system --no-create-home --group sonar
