@@ -38,8 +38,7 @@ sudo apt install unzip -y
 unzip sonarqube-10.5.1.90531.zip 
 
 #Move dir to /opt
-sudo mv sonarqube-10.5.1.90531 sonarqube
-sudo mv sonarqube /opt
+sudo mv sonarqube-10.5.1.90531 /opt/sonarqube
 #Now add sonarqube user and also permissions 
 sudo groupadd sonar
 sudo useradd -d /opt/sonarqube -g sonar sonar
@@ -91,10 +90,10 @@ WantedBy=multi-user.target
 EOF
 
 # Reload systemctl and start SonarQube
-
 sudo systemd-analyze verify /etc/systemd/system/sonarqube.service
 sudo chown -R sonar:sonar /opt/sonarqube
 sudo chmod -R 755 /opt/sonarqube
 sudo systemctl daemon-reload
-sudo systemctl start sonarqube
 sudo systemctl enable sonarqube
+sudo systemctl start sonarqube
+
